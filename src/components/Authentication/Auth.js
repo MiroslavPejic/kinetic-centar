@@ -7,18 +7,7 @@ function Auth() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // For navigation
-
-  const handleSignUp = async () => {
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    setLoading(false);
-    if (error) setError(error.message);
-    else alert('Check your email for the confirmation link!');
-  };
+  const navigate = useNavigate();
 
   const handleSignIn = async () => {
     setLoading(true);
