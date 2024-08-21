@@ -1,4 +1,3 @@
-// src/pages/Customers.js
 import React, { useState, useEffect } from 'react';
 import supabase from '../../supabaseClient'; // Import your Supabase client
 import Modal from '../Modal/Modal'; // Import the Modal component
@@ -8,6 +7,8 @@ function Customers() {
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [selectedSport, setSelectedSport] = useState('');
+  const [height, setHeight] = useState(''); // New state for height
+  const [weight, setWeight] = useState(''); // New state for weight
   const [sports, setSports] = useState([]);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('success');
@@ -67,7 +68,7 @@ function Customers() {
     // Insert data into Supabase
     const { data, error } = await supabase
       .from('customers')
-      .insert([{ name, date_of_birth: dateOfBirth, sport_id: selectedSport, user_id: user.id }]);
+      .insert([{ name, date_of_birth: dateOfBirth, sport_id: selectedSport, height, weight, user_id: user.id }]);
 
     if (error) {
       setMessage(`Greška: ${error.message}`);
@@ -79,6 +80,8 @@ function Customers() {
       setName('');
       setDateOfBirth('');
       setSelectedSport('');
+      setHeight(''); // Clear height field
+      setWeight(''); // Clear weight field
       // Fetch updated customers
       const { data: newCustomers, error: fetchError } = await supabase.from('customers').select('*').eq('deleted', false);
       if (!fetchError) {
@@ -182,6 +185,28 @@ function Customers() {
                   ))}
                 </select>
               </div>
+              <div>
+                <label htmlFor="height" className="block text-sm font-medium text-gray-700">Visina (cm)</label>
+                <input
+                  type="number"
+                  id="height"
+                  value={height}
+                  onChange={(e) => setHeight(e.target.value)}
+                  required
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
+              <div>
+                <label htmlFor="weight" className="block text-sm font-medium text-gray-700">Težina (kg)</label>
+                <input
+                  type="number"
+                  id="weight"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  required
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
               <button
                 type="submit"
                 className="bg-custom-teal text-white py-2 px-4 rounded hover:bg-custom-teal-dark w-full"
@@ -203,6 +228,8 @@ function Customers() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ime</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum Rođenja</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sport</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visina (cm)</th> {/* New column for height */}
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Težina (kg)</th> {/* New column for weight */}
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcije</th>
                     </tr>
                   </thead>
@@ -214,6 +241,8 @@ function Customers() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {sports.find(sport => sport.id === customer.sport_id)?.name || 'Nepoznat'}
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.height}</td> {/* Display height */}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.weight}</td> {/* Display weight */}
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <button
                             onClick={() => handleRemoveCustomer(customer.id)}
