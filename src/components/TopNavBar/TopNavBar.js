@@ -23,7 +23,7 @@ function TopNavBar() {
             alt="Logo"
             className="h-8 w-auto mr-2"  // Adjust size and margin as needed
           />
-          <h2 className="text-xl font-bold">Dashboard</h2>
+          <h2 className="text-xl font-bold">Kinetic Centar</h2>
         </div>
         {/* Mobile menu button */}
         <button
@@ -40,28 +40,28 @@ function TopNavBar() {
               onClick={() => navigate('/dashboard')}
             >
               <FaHome className="inline mr-1" />
-              Home
+              Početna
             </li>
             <li
               className="cursor-pointer hover:text-custom-teal-dark py-2 lg:py-0"
               onClick={() => navigate('/profile')}
             >
               <FaUser className="inline mr-1" />
-              Profile
+              Profil
             </li>
             <li
-              className="cursor-pointer hover:text-custom-teal-dark"
+              className="cursor-pointer hover:text-custom-teal-dark py-2 lg:py-0"
               onClick={() => navigate('/customers')}
             >
               <FaUser className="inline mr-1" />
-              Customers
+              Kupci
             </li>
             <li
               className="cursor-pointer hover:text-custom-teal-dark py-2 lg:py-0"
               onClick={handleSignOut}
             >
               <FaSignOutAlt className="inline mr-1" />
-              Sign Out
+              Odjava
             </li>
           </ul>
         </nav>

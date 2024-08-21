@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import supabase from '../../supabaseClient';
-import { useNavigate, Link  } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Auth() {
   const [email, setEmail] = useState('');
@@ -23,7 +23,7 @@ function Auth() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6">Sign In</h1>
+        <h1 className="text-2xl font-bold mb-6">Prijava</h1>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         {/* Existing sign-in form fields */}
         <input
@@ -35,7 +35,7 @@ function Auth() {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Lozinka"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="mb-4 w-full p-2 border border-gray-300 rounded"
@@ -45,12 +45,12 @@ function Auth() {
           className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 mb-2"
           disabled={loading}
         >
-          {loading ? 'Signing in...' : 'Sign In'}
+          {loading ? 'Prijava...' : 'Prijavi se'}
         </button>
         <p className="mt-4">
-          Don't have an account?{' '}
+          Nemate račun?{' '}
           <Link to="/signup" className="text-blue-500 hover:underline">
-            Sign Up
+            Registrirajte se
           </Link>
         </p>
       </div>

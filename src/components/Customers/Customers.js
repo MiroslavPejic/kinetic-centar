@@ -58,7 +58,7 @@ function Customers() {
     event.preventDefault();
 
     if (!user) {
-      setMessage('You must be signed in to add a customer.');
+      setMessage('Morate biti prijavljeni za dodavanje kupca.');
       setMessageType('error');
       setIsModalOpen(true);
       return;
@@ -70,10 +70,10 @@ function Customers() {
       .insert([{ name, date_of_birth: dateOfBirth, sport_id: selectedSport, user_id: user.id }]);
 
     if (error) {
-      setMessage(`Error: ${error.message}`);
+      setMessage(`Greška: ${error.message}`);
       setMessageType('error');
     } else {
-      setMessage('Customer added successfully!');
+      setMessage('Kupac je uspješno dodan!');
       setMessageType('success');
       // Clear form fields
       setName('');
@@ -96,10 +96,10 @@ function Customers() {
       .match({ id });
 
     if (error) {
-      setMessage(`Error: ${error.message}`);
+      setMessage(`Greška: ${error.message}`);
       setMessageType('error');
     } else {
-      setMessage('Customer removed successfully!');
+      setMessage('Kupac je uspješno uklonjen!');
       setMessageType('success');
       // Fetch updated customers
       const { data: newCustomers, error: fetchError } = await supabase.from('customers').select('*').eq('deleted', false);
@@ -126,7 +126,7 @@ function Customers() {
               activeTab === 'create' ? 'border-custom-teal text-custom-teal' : 'border-transparent text-gray-600'
             }`}
           >
-            Create Customer
+            Dodaj Kupca
           </button>
           <button
             onClick={() => setActiveTab('view')}
@@ -134,17 +134,17 @@ function Customers() {
               activeTab === 'view' ? 'border-custom-teal text-custom-teal' : 'border-transparent text-gray-600'
             }`}
           >
-            View Customers
+            Pregled Kupaca
           </button>
         </div>
 
         {/* Conditional Rendering Based on Active Tab */}
         {activeTab === 'create' && (
           <div>
-            <h1 className="text-2xl font-bold mb-4 text-center">Add New Customer</h1>
+            <h1 className="text-2xl font-bold mb-4 text-center">Dodaj Novog Kupca</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Ime</label>
                 <input
                   type="text"
                   id="name"
@@ -155,7 +155,7 @@ function Customers() {
                 />
               </div>
               <div>
-                <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">Date of Birth</label>
+                <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700">Datum Rođenja</label>
                 <input
                   type="date"
                   id="dateOfBirth"
@@ -174,7 +174,7 @@ function Customers() {
                   required
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 >
-                  <option value="" disabled>Select a sport</option>
+                  <option value="" disabled>Odaberite sport</option>
                   {sports.map((sport) => (
                     <option key={sport.id} value={sport.id}>
                       {sport.name}
@@ -186,7 +186,7 @@ function Customers() {
                 type="submit"
                 className="bg-custom-teal text-white py-2 px-4 rounded hover:bg-custom-teal-dark w-full"
               >
-                Add Customer
+                Dodaj Kupca
               </button>
             </form>
           </div>
@@ -194,16 +194,16 @@ function Customers() {
 
         {activeTab === 'view' && (
           <div>
-            <h1 className="text-2xl font-bold mb-4 text-center">Customer List</h1>
+            <h1 className="text-2xl font-bold mb-4 text-center">Lista Kupaca</h1>
             {customers.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date of Birth</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ime</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum Rođenja</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sport</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcije</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -212,7 +212,7 @@ function Customers() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{customer.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(customer.date_of_birth).toLocaleDateString()}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {sports.find(sport => sport.id === customer.sport_id)?.name || 'Unknown'}
+                          {sports.find(sport => sport.id === customer.sport_id)?.name || 'Nepoznat'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <button
@@ -220,7 +220,7 @@ function Customers() {
                             className="text-red-600 hover:text-red-800 flex items-center"
                           >
                             <FaTrashAlt className="mr-1" />
-                            Remove
+                            Ukloni
                           </button>
                         </td>
                       </tr>
@@ -229,7 +229,7 @@ function Customers() {
                 </table>
               </div>
             ) : (
-              <p className="text-center text-gray-500">No customers found</p>
+              <p className="text-center text-gray-500">Nema kupaca</p>
             )}
           </div>
         )}
