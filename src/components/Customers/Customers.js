@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import supabase from '../../supabaseClient'; // Import your Supabase client
-import Modal from '../Modal/Modal'; // Import the Modal component
+import supabase from '../../supabaseClient';
+import Modal from '../Modal/Modal';
 import { FaTrashAlt } from 'react-icons/fa';
 
 function Customers() {
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
+  const [age, setAge] = useState('');
   const [selectedSport, setSelectedSport] = useState('');
-  const [height, setHeight] = useState(''); // New state for height
-  const [weight, setWeight] = useState(''); // New state for weight
+  const [category, setCategory] = useState('');
+  const [playerPosition, setPlayerPosition] = useState('');
+  const [injuryHistory, setInjuryHistory] = useState('no');
+  const [injuryNotes, setInjuryNotes] = useState('');
+  const [dominantSide, setDominantSide] = useState('');
   const [sports, setSports] = useState([]);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('success');
@@ -18,7 +22,6 @@ function Customers() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    // Fetch the current user
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
@@ -28,7 +31,6 @@ function Customers() {
   }, []);
 
   useEffect(() => {
-    // Fetch sports from the database
     const fetchSports = async () => {
       const { data, error } = await supabase.from('sports').select('*');
       if (error) {
@@ -42,7 +44,6 @@ function Customers() {
   }, []);
 
   useEffect(() => {
-    // Fetch customers on component mount
     const fetchCustomers = async () => {
       const { data, error } = await supabase.from('customers').select('*').eq('deleted', false);
       if (error) {
@@ -55,6 +56,30 @@ function Customers() {
     fetchCustomers();
   }, []);
 
+  const calculateAge = (dob) => {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+
+    return age;
+  };
+
+  const handleDateOfBirthChange = (e) => {
+    const dob = e.target.value;
+    setDateOfBirth(dob);
+    if (dob) {
+      const calculatedAge = calculateAge(dob);
+      setAge(calculatedAge);
+    } else {
+      setAge('');
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -65,10 +90,20 @@ function Customers() {
       return;
     }
 
-    // Insert data into Supabase
     const { data, error } = await supabase
       .from('customers')
-      .insert([{ name, date_of_birth: dateOfBirth, sport_id: selectedSport, height, weight, user_id: user.id }]);
+      .insert([{
+        name,
+        date_of_birth: dateOfBirth,
+        sport_id: selectedSport,
+        user_id: user.id,
+        age,
+        category,
+        player_position: playerPosition,
+        injury_history: injuryHistory === 'yes',
+        injury_notes: injuryNotes,
+        dominant_side: dominantSide
+      }]);
 
     if (error) {
       setMessage(`Greška: ${error.message}`);
@@ -76,13 +111,15 @@ function Customers() {
     } else {
       setMessage('Kupac je uspješno dodan!');
       setMessageType('success');
-      // Clear form fields
       setName('');
       setDateOfBirth('');
       setSelectedSport('');
-      setHeight(''); // Clear height field
-      setWeight(''); // Clear weight field
-      // Fetch updated customers
+      setAge('');
+      setCategory('');
+      setPlayerPosition('');
+      setInjuryHistory('no');
+      setInjuryNotes('');
+      setDominantSide('');
       const { data: newCustomers, error: fetchError } = await supabase.from('customers').select('*').eq('deleted', false);
       if (!fetchError) {
         setCustomers(newCustomers);
@@ -104,7 +141,6 @@ function Customers() {
     } else {
       setMessage('Kupac je uspješno uklonjen!');
       setMessageType('success');
-      // Fetch updated customers
       const { data: newCustomers, error: fetchError } = await supabase.from('customers').select('*').eq('deleted', false);
       if (!fetchError) {
         setCustomers(newCustomers);
@@ -163,22 +199,33 @@ function Customers() {
                   type="date"
                   id="dateOfBirth"
                   value={dateOfBirth}
-                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  onChange={handleDateOfBirthChange}
                   required
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 />
               </div>
               <div>
-                <label htmlFor="sport" className="block text-sm font-medium text-gray-700">Sport</label>
+                <label htmlFor="age" className="block text-sm font-medium text-gray-700">Dob</label>
+                <input
+                  type="text"
+                  id="age"
+                  value={age}
+                  readOnly
+                  disabled
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
+                />
+              </div>
+              <div>
+                <label htmlFor="selectedSport" className="block text-sm font-medium text-gray-700">Sport</label>
                 <select
-                  id="sport"
+                  id="selectedSport"
                   value={selectedSport}
                   onChange={(e) => setSelectedSport(e.target.value)}
                   required
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 >
-                  <option value="" disabled>Odaberite sport</option>
-                  {sports.map((sport) => (
+                  <option value="">Odaberite sport</option>
+                  {sports.map(sport => (
                     <option key={sport.id} value={sport.id}>
                       {sport.name}
                     </option>
@@ -186,26 +233,61 @@ function Customers() {
                 </select>
               </div>
               <div>
-                <label htmlFor="height" className="block text-sm font-medium text-gray-700">Visina (cm)</label>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700">Kategorija</label>
                 <input
-                  type="number"
-                  id="height"
-                  value={height}
-                  onChange={(e) => setHeight(e.target.value)}
-                  required
+                  type="text"
+                  id="category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 />
               </div>
               <div>
-                <label htmlFor="weight" className="block text-sm font-medium text-gray-700">Težina (kg)</label>
+                <label htmlFor="playerPosition" className="block text-sm font-medium text-gray-700">Pozicija Igrača</label>
                 <input
-                  type="number"
-                  id="weight"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                  required
+                  type="text"
+                  id="playerPosition"
+                  value={playerPosition}
+                  onChange={(e) => setPlayerPosition(e.target.value)}
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 />
+              </div>
+              <div>
+                <label htmlFor="injuryHistory" className="block text-sm font-medium text-gray-700">Povijest Ozljeda</label>
+                <select
+                  id="injuryHistory"
+                  value={injuryHistory}
+                  onChange={(e) => setInjuryHistory(e.target.value)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                >
+                  <option value="no">Ne</option>
+                  <option value="yes">Da</option>
+                </select>
+              </div>
+              {injuryHistory === 'yes' && (
+                <div>
+                  <label htmlFor="injuryNotes" className="block text-sm font-medium text-gray-700">Bilješke o Ozljedama</label>
+                  <textarea
+                    id="injuryNotes"
+                    value={injuryNotes}
+                    onChange={(e) => setInjuryNotes(e.target.value)}
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                    rows="3"
+                  ></textarea>
+                </div>
+              )}
+              <div>
+                <label htmlFor="dominantSide" className="block text-sm font-medium text-gray-700">Dominantna Strana Tijela</label>
+                <select
+                  id="dominantSide"
+                  value={dominantSide}
+                  onChange={(e) => setDominantSide(e.target.value)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                >
+                  <option value="">Odaberite stranu</option>
+                  <option value="left">Lijeva</option>
+                  <option value="right">Desna</option>
+                </select>
               </div>
               <button
                 type="submit"
@@ -227,9 +309,13 @@ function Customers() {
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ime</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum Rođenja</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dob</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sport</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visina (cm)</th> {/* New column for height */}
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Težina (kg)</th> {/* New column for weight */}
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategorija</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pozicija</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Povijest Ozljeda</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bilješke</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dominantna Strana</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcije</th>
                     </tr>
                   </thead>
@@ -238,11 +324,15 @@ function Customers() {
                       <tr key={customer.id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{customer.name}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(customer.date_of_birth).toLocaleDateString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.age}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {sports.find(sport => sport.id === customer.sport_id)?.name || 'Nepoznat'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.height}</td> {/* Display height */}
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.weight}</td> {/* Display weight */}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.category}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.player_position}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.injury_history ? 'Da' : 'Ne'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.injury_notes || 'Nema'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.dominant_side === 'left' ? 'Lijeva' : 'Desna'}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <button
                             onClick={() => handleRemoveCustomer(customer.id)}
@@ -264,7 +354,6 @@ function Customers() {
         )}
       </div>
 
-      {/* Success/Error Modal */}
       <Modal isOpen={isModalOpen} onClose={closeModal} message={message} type={messageType} />
     </div>
   );
