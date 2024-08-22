@@ -1,18 +1,22 @@
+// src/pages/Customers.js
 import React, { useState, useEffect } from 'react';
 import supabase from '../../supabaseClient';
-import Modal from '../Modal/Modal';
+import Modal from '../Modal/Modal'; // Import the Modal component
 import { FaTrashAlt } from 'react-icons/fa';
 
 function Customers() {
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [age, setAge] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
   const [selectedSport, setSelectedSport] = useState('');
   const [category, setCategory] = useState('');
   const [playerPosition, setPlayerPosition] = useState('');
   const [injuryHistory, setInjuryHistory] = useState('no');
   const [injuryNotes, setInjuryNotes] = useState('');
   const [dominantSide, setDominantSide] = useState('');
+  const [pathology, setPathology] = useState('');
   const [sports, setSports] = useState([]);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('success');
@@ -22,6 +26,7 @@ function Customers() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
+    // Fetch the current user
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
@@ -31,6 +36,7 @@ function Customers() {
   }, []);
 
   useEffect(() => {
+    // Fetch sports from the database
     const fetchSports = async () => {
       const { data, error } = await supabase.from('sports').select('*');
       if (error) {
@@ -44,6 +50,7 @@ function Customers() {
   }, []);
 
   useEffect(() => {
+    // Fetch customers on component mount
     const fetchCustomers = async () => {
       const { data, error } = await supabase.from('customers').select('*').eq('deleted', false);
       if (error) {
@@ -57,27 +64,11 @@ function Customers() {
   }, []);
 
   const calculateAge = (dob) => {
+    if (!dob) return '';
     const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-
-    return age;
-  };
-
-  const handleDateOfBirthChange = (e) => {
-    const dob = e.target.value;
-    setDateOfBirth(dob);
-    if (dob) {
-      const calculatedAge = calculateAge(dob);
-      setAge(calculatedAge);
-    } else {
-      setAge('');
-    }
+    const ageDifMs = Date.now() - birthDate.getTime();
+    const ageDate = new Date(ageDifMs);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
   };
 
   const handleSubmit = async (event) => {
@@ -90,19 +81,23 @@ function Customers() {
       return;
     }
 
+    // Insert data into Supabase
     const { data, error } = await supabase
       .from('customers')
-      .insert([{
-        name,
-        date_of_birth: dateOfBirth,
-        sport_id: selectedSport,
-        user_id: user.id,
-        age,
-        category,
-        player_position: playerPosition,
-        injury_history: injuryHistory === 'yes',
-        injury_notes: injuryNotes,
-        dominant_side: dominantSide
+      .insert([{ 
+        name, 
+        date_of_birth: dateOfBirth, 
+        age, 
+        height, 
+        weight, 
+        sport_id: selectedSport, 
+        user_id: user.id, 
+        category, 
+        player_position: playerPosition, 
+        injury_history: injuryHistory, 
+        injury_notes: injuryNotes, 
+        dominant_side: dominantSide,
+        pathology: pathology
       }]);
 
     if (error) {
@@ -111,15 +106,20 @@ function Customers() {
     } else {
       setMessage('Kupac je uspješno dodan!');
       setMessageType('success');
+      // Clear form fields
       setName('');
       setDateOfBirth('');
-      setSelectedSport('');
       setAge('');
+      setHeight('');
+      setWeight('');
+      setSelectedSport('');
       setCategory('');
       setPlayerPosition('');
       setInjuryHistory('no');
       setInjuryNotes('');
       setDominantSide('');
+      setPathology('');
+      // Fetch updated customers
       const { data: newCustomers, error: fetchError } = await supabase.from('customers').select('*').eq('deleted', false);
       if (!fetchError) {
         setCustomers(newCustomers);
@@ -141,6 +141,7 @@ function Customers() {
     } else {
       setMessage('Kupac je uspješno uklonjen!');
       setMessageType('success');
+      // Fetch updated customers
       const { data: newCustomers, error: fetchError } = await supabase.from('customers').select('*').eq('deleted', false);
       if (!fetchError) {
         setCustomers(newCustomers);
@@ -199,33 +200,57 @@ function Customers() {
                   type="date"
                   id="dateOfBirth"
                   value={dateOfBirth}
-                  onChange={handleDateOfBirthChange}
+                  onChange={(e) => {
+                    setDateOfBirth(e.target.value);
+                    setAge(calculateAge(e.target.value));
+                  }}
                   required
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 />
               </div>
               <div>
-                <label htmlFor="age" className="block text-sm font-medium text-gray-700">Dob</label>
+                <label htmlFor="age" className="block text-sm font-medium text-gray-700">Godine</label>
                 <input
                   type="text"
                   id="age"
                   value={age}
                   readOnly
-                  disabled
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded bg-gray-100"
                 />
               </div>
               <div>
-                <label htmlFor="selectedSport" className="block text-sm font-medium text-gray-700">Sport</label>
+                <label htmlFor="height" className="block text-sm font-medium text-gray-700">Visina (cm)</label>
+                <input
+                  type="number"
+                  id="height"
+                  value={height}
+                  onChange={(e) => setHeight(e.target.value)}
+                  required
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
+              <div>
+                <label htmlFor="weight" className="block text-sm font-medium text-gray-700">Težina (kg)</label>
+                <input
+                  type="number"
+                  id="weight"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  required
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
+              <div>
+                <label htmlFor="sport" className="block text-sm font-medium text-gray-700">Sport</label>
                 <select
-                  id="selectedSport"
+                  id="sport"
                   value={selectedSport}
                   onChange={(e) => setSelectedSport(e.target.value)}
                   required
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 >
-                  <option value="">Odaberite sport</option>
-                  {sports.map(sport => (
+                  <option value="" disabled>Odaberite sport</option>
+                  {sports.map((sport) => (
                     <option key={sport.id} value={sport.id}>
                       {sport.name}
                     </option>
@@ -239,6 +264,7 @@ function Customers() {
                   id="category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
+                  required
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 />
               </div>
@@ -249,6 +275,7 @@ function Customers() {
                   id="playerPosition"
                   value={playerPosition}
                   onChange={(e) => setPlayerPosition(e.target.value)}
+                  required
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 />
               </div>
@@ -258,6 +285,7 @@ function Customers() {
                   id="injuryHistory"
                   value={injuryHistory}
                   onChange={(e) => setInjuryHistory(e.target.value)}
+                  required
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 >
                   <option value="no">Ne</option>
@@ -272,26 +300,36 @@ function Customers() {
                     value={injuryNotes}
                     onChange={(e) => setInjuryNotes(e.target.value)}
                     className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                    rows="3"
-                  ></textarea>
+                  />
                 </div>
               )}
               <div>
-                <label htmlFor="dominantSide" className="block text-sm font-medium text-gray-700">Dominantna Strana Tijela</label>
+                <label htmlFor="dominantSide" className="block text-sm font-medium text-gray-700">Dominantna Strana</label>
                 <select
                   id="dominantSide"
                   value={dominantSide}
                   onChange={(e) => setDominantSide(e.target.value)}
+                  required
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 >
-                  <option value="">Odaberite stranu</option>
+                  <option value="" disabled>Odaberite stranu</option>
                   <option value="left">Lijeva</option>
                   <option value="right">Desna</option>
                 </select>
               </div>
+              <div>
+                <label htmlFor="pathology" className="block text-sm font-medium text-gray-700">Patologija</label>
+                <input
+                  type="text"
+                  id="pathology"
+                  value={pathology}
+                  onChange={(e) => setPathology(e.target.value)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
               <button
                 type="submit"
-                className="bg-custom-teal text-white py-2 px-4 rounded hover:bg-custom-teal-dark w-full"
+                className="bg-custom-teal text-white py-2 px-4 rounded hover:bg-teal-700"
               >
                 Dodaj Kupca
               </button>
@@ -300,60 +338,58 @@ function Customers() {
         )}
 
         {activeTab === 'view' && (
-          <div>
-            <h1 className="text-2xl font-bold mb-4 text-center">Lista Kupaca</h1>
-            {customers.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ime</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum Rođenja</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dob</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sport</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategorija</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pozicija</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Povijest Ozljeda</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bilješke</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dominantna Strana</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcije</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {customers.map((customer) => (
-                      <tr key={customer.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{customer.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(customer.date_of_birth).toLocaleDateString()}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.age}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {sports.find(sport => sport.id === customer.sport_id)?.name || 'Nepoznat'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.category}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.player_position}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.injury_history ? 'Da' : 'Ne'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.injury_notes || 'Nema'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{customer.dominant_side === 'left' ? 'Lijeva' : 'Desna'}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <button
-                            onClick={() => handleRemoveCustomer(customer.id)}
-                            className="text-red-600 hover:text-red-800 flex items-center"
-                          >
-                            <FaTrashAlt className="mr-1" />
-                            Ukloni
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p className="text-center text-gray-500">Nema kupaca</p>
-            )}
+          <div className="overflow-x-auto">
+            <h1 className="text-2xl font-bold mb-4 text-center">Pregled Kupaca</h1>
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ime</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum Rođenja</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Godine</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visina</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Težina</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sport</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategorija</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pozicija Igrača</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Povijest Ozljeda</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bilješke o Ozljedama</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dominantna Strana</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patologija</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcija</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {customers.map((customer) => (
+                  <tr key={customer.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">{customer.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{new Date(customer.date_of_birth).toLocaleDateString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{customer.age}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{customer.height} cm</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{customer.weight} kg</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{sports.find((sport) => sport.id === customer.sport_id)?.name || 'N/A'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{customer.category}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{customer.player_position}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{customer.injury_history === 'yes' ? 'Da' : 'Ne'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{customer.injury_notes || 'N/A'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{customer.dominant_side === 'left' ? 'Lijeva' : 'Desna'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{customer.pathology || 'N/A'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <button
+                        onClick={() => handleRemoveCustomer(customer.id)}
+                        className="text-red-600 hover:text-red-900 flex items-center"
+                      >
+                        <FaTrashAlt />Ukloni
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
 
+      {/* Success/Error Modal */}
       <Modal isOpen={isModalOpen} onClose={closeModal} message={message} type={messageType} />
     </div>
   );
