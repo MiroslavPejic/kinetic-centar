@@ -387,7 +387,7 @@ function Customers() {
                         onClick={() => handleViewCustomer(customer.id)}
                         className="bg-custom-blue hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                       >
-                        View
+                        informacija
                       </button>
                       &nbsp;
                       <button

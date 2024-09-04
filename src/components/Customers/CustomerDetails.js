@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import supabase from '../../supabaseClient';
 import Modal from '../Modal/Modal';
+import { Box, Button, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, TablePagination } from '@mui/material';
 
 function CustomerDetails() {
   const { id } = useParams(); // Dohvaća ID klijenta iz URL-a
   const [customer, setCustomer] = useState(null);
   const [history, setHistory] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [newWeight, setNewWeight] = useState('');
   const [newDetail, setNewDetail] = useState('');
   const [message, setMessage] = useState('');
@@ -93,16 +96,21 @@ function CustomerDetails() {
     setIsModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
   const openFormModal = () => {
     setIsFormModalOpen(true);
   };
 
   const closeFormModal = () => {
     setIsFormModalOpen(false);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setCurrentPage(0);
   };
 
   return (
@@ -134,33 +142,46 @@ function CustomerDetails() {
             </div>
 
             <h2 className="text-xl font-bold mt-6">Povijest</h2>
-            <table className="min-w-full divide-y divide-gray-200 mt-4">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Težina</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalj</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcija</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {history.map((record) => (
-                  <tr key={record.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{new Date(record.date).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{record.weight} kg</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{record.detail}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <button
-                        onClick={() => handleDeleteRecord(record.id)}
-                        className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-800"
-                      >
-                        Ukloni
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <br/>
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Datum</TableCell>
+                    <TableCell>Težina</TableCell>
+                    <TableCell>Detalj</TableCell>
+                    <TableCell>Akcija</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {history.slice(currentPage * rowsPerPage, currentPage * rowsPerPage + rowsPerPage).map((record) => (
+                    <TableRow key={record.id}>
+                      <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
+                      <TableCell>{record.weight} kg</TableCell>
+                      <TableCell>{record.detail}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="contained"
+                          color="error"
+                          onClick={() => handleDeleteRecord(record.id)}
+                        >
+                          Ukloni
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={history.length}
+              rowsPerPage={rowsPerPage}
+              page={currentPage}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
           </>
         )}
       </div>
