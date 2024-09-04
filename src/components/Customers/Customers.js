@@ -1,10 +1,15 @@
 // src/pages/Customers.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import supabase from '../../supabaseClient';
 import Modal from '../Modal/Modal'; // Import the Modal component
 import { FaTrashAlt } from 'react-icons/fa';
 
+import './customers.css'
+
 function Customers() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [age, setAge] = useState('');
@@ -151,37 +156,41 @@ function Customers() {
     setIsModalOpen(true);
   };
 
+  const handleViewCustomer = (id) => {
+    navigate(`/customers/${id}`);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
   };
 
   return (
-    <div className="pt-16 px-4 max-w-4xl mx-auto">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+    <div className="pt-16 px-4 max-w-full mx-auto">
+      <div className="customer-details bg-white p-6 rounded-lg shadow-lg">
         {/* Tab Bar */}
         <div className="flex border-b border-gray-300 mb-4">
           <button
             onClick={() => setActiveTab('create')}
-            className={`flex-1 py-2 text-center font-medium text-sm border-b-2 ${
+            className={`py-2 text-center font-medium text-sm border-b-2 w-1/3 ${
               activeTab === 'create' ? 'border-custom-teal text-custom-teal' : 'border-transparent text-gray-600'
             }`}
           >
-            Dodaj Kupca
+            Dodaj klijenta
           </button>
           <button
             onClick={() => setActiveTab('view')}
-            className={`flex-1 py-2 text-center font-medium text-sm border-b-2 ${
+            className={`py-2 text-center font-medium text-sm border-b-2 flex-1 ${
               activeTab === 'view' ? 'border-custom-teal text-custom-teal' : 'border-transparent text-gray-600'
             }`}
           >
-            Pregled Kupaca
+            Pregled klijenta
           </button>
         </div>
 
         {/* Conditional Rendering Based on Active Tab */}
         {activeTab === 'create' && (
-          <div>
-            <h1 className="text-2xl font-bold mb-4 text-center">Dodaj Novog Kupca</h1>
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-2xl font-bold mb-4 text-center">Dodaj Novog klijenta</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">Ime</label>
@@ -329,9 +338,9 @@ function Customers() {
               </div>
               <button
                 type="submit"
-                className="bg-custom-teal text-white py-2 px-4 rounded hover:bg-teal-700"
+                className="bg-custom-blue text-white py-2 px-4 rounded hover:bg-teal-700"
               >
-                Dodaj Kupca
+                Dodaj klijenta
               </button>
             </form>
           </div>
@@ -355,7 +364,7 @@ function Customers() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bilješke o Ozljedama</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dominantna Strana</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patologija</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcija</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">Akcija</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -375,10 +384,17 @@ function Customers() {
                     <td className="px-6 py-4 whitespace-nowrap">{customer.pathology || 'N/A'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <button
-                        onClick={() => handleRemoveCustomer(customer.id)}
-                        className="text-red-600 hover:text-red-900 flex items-center"
+                        onClick={() => handleViewCustomer(customer.id)}
+                        className="bg-custom-blue hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                       >
-                        <FaTrashAlt />Ukloni
+                        View
+                      </button>
+                      &nbsp;
+                      <button
+                        onClick={() => handleRemoveCustomer(customer.id)}
+                        className="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                      >
+                        Ukloni
                       </button>
                     </td>
                   </tr>

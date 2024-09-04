@@ -15,7 +15,7 @@ function TopNavBar() {
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full bg-custom-teal text-custom-text shadow-md z-50">
+    <div className="fixed top-0 left-0 w-full bg-custom-blue text-white shadow-md z-50">
       <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
         <div className="flex items-center">
           <img
@@ -54,7 +54,7 @@ function TopNavBar() {
               onClick={() => navigate('/customers')}
             >
               <FaUser className="inline mr-1" />
-              Kupci
+              klijent
             </li>
             <li
               className="cursor-pointer hover:text-custom-teal-dark py-2 lg:py-0"

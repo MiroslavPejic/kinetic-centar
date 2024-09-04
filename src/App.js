@@ -6,6 +6,7 @@ import ProtectedRoute from './ProtectedRoute';
 import SignUp from './components/Authentication/SignUp';
 import Profile from './components/Profile/Profile'
 import Customers from './components/Customers/Customers';
+import CustomerDetails from './components/Customers/CustomerDetails';
 import TopNavBar from './components/TopNavBar/TopNavBar';
 
 function App() {
@@ -49,6 +50,12 @@ function PageWithNav() {
         <Route path="/customers" element={
           <ProtectedRoute>
             <Customers/>
+          </ProtectedRoute>
+          } 
+        />
+        <Route path="/customers/:id" element={
+          <ProtectedRoute>
+            <CustomerDetails />
           </ProtectedRoute>
           } 
         />
