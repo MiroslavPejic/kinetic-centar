@@ -4,8 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import supabase from '../../supabaseClient';
 import Modal from '../Modal/Modal'; // Import the Modal component
 import { FaTrashAlt } from 'react-icons/fa';
+import * as XLSX from 'xlsx'; // Import xlsx for Excel generation
 
 import './customers.css'
+
+// sub-components
+import ViewCustomers from './CustomerMainPage/ViewCustomers';
 
 function Customers() {
   const navigate = useNavigate();
@@ -145,7 +149,7 @@ function Customers() {
       setMessage(`Greška: ${error.message}`);
       setMessageType('error');
     } else {
-      setMessage('Kupac je uspješno uklonjen!');
+      setMessage('Klijent je uspješno uklonjen!');
       setMessageType('success');
       // Fetch updated customers
       const { data: newCustomers, error: fetchError } = await supabase.from('customers').select('*').eq('deleted', false);
@@ -157,8 +161,27 @@ function Customers() {
     setIsModalOpen(true);
   };
 
-  const handleViewCustomer = (id) => {
-    navigate(`/customers/${id}`);
+  // Download Excel file
+  const handleDownloadExcel = () => {
+    const customerData = customers.map(customer => ({
+      Ime: customer.name,
+      'Datum Rođenja': new Date(customer.date_of_birth).toLocaleDateString(),
+      Godine: customer.age,
+      Visina: `${customer.height} cm`,
+      Težina: `${customer.weight} kg`,
+      Sport: sports.find(sport => sport.id === customer.sport_id)?.name || 'N/A',
+      Kategorija: customer.category,
+      'Pozicija Igrača': customer.player_position,
+      'Povijest Ozljeda': customer.injury_history === 'yes' ? 'Da' : 'Ne',
+      'Bilješke o Ozljedama': customer.injury_notes || 'N/A',
+      'Dominantna Strana': customer.dominant_side === 'left' ? 'Lijeva' : 'Desna',
+      Patologija: customer.pathology || 'N/A'
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(customerData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Customers');
+    XLSX.writeFile(workbook, 'customers.xlsx');
   };
 
   const closeModal = () => {
@@ -348,61 +371,11 @@ function Customers() {
         )}
 
         {activeTab === 'view' && (
-          <div className="overflow-x-auto">
-            <h1 className="text-2xl font-bold mb-4 text-center">Pregled Klijenta</h1>
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead>
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ime</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum Rođenja</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Godine</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visina</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Težina</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sport</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategorija</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pozicija Igrača</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Povijest Ozljeda</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bilješke o Ozljedama</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dominantna Strana</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patologija</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">Akcija</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {customers.map((customer) => (
-                  <tr key={customer.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">{customer.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{new Date(customer.date_of_birth).toLocaleDateString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{customer.age}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{customer.height} cm</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{customer.weight} kg</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{sports.find((sport) => sport.id === customer.sport_id)?.name || 'N/A'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{customer.category}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{customer.player_position}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{customer.injury_history === 'yes' ? 'Da' : 'Ne'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{customer.injury_notes || 'N/A'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{customer.dominant_side === 'left' ? 'Lijeva' : 'Desna'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{customer.pathology || 'N/A'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <button
-                        onClick={() => handleViewCustomer(customer.id)}
-                        className="bg-custom-blue hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                      >
-                        informacija
-                      </button>
-                      &nbsp;
-                      <button
-                        onClick={() => handleRemoveCustomer(customer.id)}
-                        className="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                      >
-                        Ukloni
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ViewCustomers 
+            customers={customers}
+            sports={sports}
+            handleRemoveCustomer={handleRemoveCustomer}
+            handleDownloadExcel={handleDownloadExcel}/>
         )}
       </div>
 

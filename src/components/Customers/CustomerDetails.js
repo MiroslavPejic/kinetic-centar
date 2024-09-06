@@ -5,6 +5,7 @@ import Modal from '../Modal/Modal';
 import { Box, Button, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, TablePagination } from '@mui/material';
 
 // Form fields
+import BaseFields from './CustomerDetailFormFields/BaseFields';
 import HipRomFormFields from './CustomerDetailFormFields/HipRomFormFields';
 
 function CustomerDetails() {
@@ -30,7 +31,14 @@ function CustomerDetails() {
 
   useEffect(() => {
     const fetchCustomer = async () => {
-      const { data, error } = await supabase.from('customers').select('*').eq('id', id).single();
+      const { data, error } = await supabase
+      .from('customers')
+      .select(`
+        *,
+        sports (name)
+      `)
+      .eq('id', id).single()
+      
       if (error) {
         console.error('Greška prilikom dohvaćanja klijenta:', error);
       } else {
@@ -142,7 +150,7 @@ function CustomerDetails() {
               <p><strong>Dob:</strong> {customer.age}</p>
               <p><strong>Visina:</strong> {customer.height} cm</p>
               <p><strong>Težina:</strong> {customer.weight} kg</p>
-              <p><strong>Sport:</strong> {customer.sport_id}</p>
+              <p><strong>Sport:</strong> {customer.sports.name}</p>
               <p><strong>Kategorija:</strong> {customer.category}</p>
               <p><strong>Pozicija igrača:</strong> {customer.player_position}</p>
               <p><strong>Povijest ozljeda:</strong> {customer.injury_history === 'yes' ? 'Da' : 'Ne'}</p>
@@ -222,39 +230,14 @@ function CustomerDetails() {
            <>
            <h2 className="text-xl font-bold mb-4">Dodaj novi zapis</h2>
             <form onSubmit={handleAddRecord} className="space-y-4">
-              <div>
-                <label htmlFor="newWeight" className="block text-sm font-medium text-gray-700">Težina (kg)</label>
-                <input
-                  type="number"
-                  id="newWeight"
-                  value={newWeight}
-                  onChange={(e) => setNewWeight(e.target.value)}
-                  required
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              <div>
-                <label htmlFor="newDetail" className="block text-sm font-medium text-gray-700">Detalj</label>
-                <input
-                  type="text"
-                  id="newDetail"
-                  value={newDetail}
-                  onChange={(e) => setNewDetail(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              {/* New Fields */}
-              <div>
-                <label htmlFor="flexibility" className="block text-sm font-medium text-gray-700">Fleksibilnost</label>
-                <input
-                  type="text"
-                  id="flexibility"
-                  value={flexibility}
-                  onChange={(e) => setFlexibility(e.target.value)}
-                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-              
+              <BaseFields
+                newWeight={newWeight}
+                setNewWeight={setNewWeight}
+                newDetail={newDetail}
+                setNewDetail={setNewDetail}
+                flexibility={flexibility}
+                setFlexibility={setFlexibility}/>
+
               <HipRomFormFields
                 hipRomLeftInternal={hipRomLeftInternal}
                 setHipRomLeftInternal={setHipRomLeftInternal}
@@ -263,8 +246,7 @@ function CustomerDetails() {
                 hipRomRightInternal={hipRomRightInternal}
                 setHipRomRightInternal={setHipRomRightInternal}
                 hipRomRightExternal={hipRomRightExternal}
-                setHipRomRightExternal={setHipRomRightExternal}
-              />
+                setHipRomRightExternal={setHipRomRightExternal}/>
 
               <div className="flex justify-end">
                 <button
