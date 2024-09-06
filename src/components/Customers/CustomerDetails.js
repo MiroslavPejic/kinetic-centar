@@ -4,8 +4,11 @@ import supabase from '../../supabaseClient';
 import Modal from '../Modal/Modal';
 import { Box, Button, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, TablePagination } from '@mui/material';
 
+// Form fields
+import HipRomFormFields from './CustomerDetailFormFields/HipRomFormFields';
+
 function CustomerDetails() {
-  const { id } = useParams(); // Dohvaća ID klijenta iz URL-a
+  const { id } = useParams();
   const [customer, setCustomer] = useState(null);
   const [history, setHistory] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -15,10 +18,17 @@ function CustomerDetails() {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('success');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false); // State for form modal
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+
+  const [flexibility, setFlexibility] = useState('');
+
+  // Hip ROM fields
+  const [hipRomLeftInternal, setHipRomLeftInternal] = useState('');
+  const [hipRomLeftExternal, setHipRomLeftExternal] = useState('');
+  const [hipRomRightInternal, setHipRomRightInternal] = useState('');
+  const [hipRomRightExternal, setHipRomRightExternal] = useState('');
 
   useEffect(() => {
-    // Dohvati detalje klijenta
     const fetchCustomer = async () => {
       const { data, error } = await supabase.from('customers').select('*').eq('id', id).single();
       if (error) {
@@ -28,7 +38,6 @@ function CustomerDetails() {
       }
     };
 
-    // Dohvati povijest klijenta
     const fetchHistory = async () => {
       const { data, error } = await supabase.from('customer_history').select('*').eq('customer_id', id);
       if (error) {
@@ -52,7 +61,12 @@ function CustomerDetails() {
           customer_id: id,
           weight: newWeight,
           detail: newDetail,
-          date: new Date().toISOString(), // Trenutni datum/vrijeme
+          flexibility,
+          hip_rom_left_internal: hipRomLeftInternal,
+          hip_rom_left_external: hipRomLeftExternal,
+          hip_rom_right_internal: hipRomRightInternal,
+          hip_rom_right_external: hipRomRightExternal,
+          date: new Date().toISOString(),
         },
       ]);
 
@@ -64,9 +78,13 @@ function CustomerDetails() {
       setMessageType('success');
       setNewWeight('');
       setNewDetail('');
-      setIsFormModalOpen(false); // Close form modal after successful submission
+      setFlexibility('');
+      setHipRomLeftInternal('');
+      setHipRomLeftExternal('');
+      setHipRomRightInternal('');
+      setHipRomRightExternal('');
+      setIsFormModalOpen(false);
 
-      // Dohvati ažuriranu povijest
       const { data: updatedHistory, error: historyError } = await supabase.from('customer_history').select('*').eq('customer_id', id);
       if (!historyError) {
         setHistory(updatedHistory);
@@ -114,7 +132,7 @@ function CustomerDetails() {
   };
 
   return (
-    <div className="pt-16 px-4 max-w-full mx-auto">
+    <div className="pt-24 px-4 max-w-full mx-auto bg-gradient-to-b from-custom-blue to-white">
       <div className="bg-white p-6 rounded-lg shadow-lg">
         {customer && (
           <>
@@ -150,6 +168,11 @@ function CustomerDetails() {
                     <TableCell>Datum</TableCell>
                     <TableCell>Težina</TableCell>
                     <TableCell>Detalj</TableCell>
+                    <TableCell>Fleksibilnost</TableCell>
+                    <TableCell>Hip ROM Left-internal</TableCell>
+                    <TableCell>Hip ROM Left-external</TableCell>
+                    <TableCell>Hip ROM Right-internal</TableCell>
+                    <TableCell>Hip ROM Right-external</TableCell>
                     <TableCell>Akcija</TableCell>
                   </TableRow>
                 </TableHead>
@@ -159,6 +182,11 @@ function CustomerDetails() {
                       <TableCell>{new Date(record.date).toLocaleDateString()}</TableCell>
                       <TableCell>{record.weight} kg</TableCell>
                       <TableCell>{record.detail}</TableCell>
+                      <TableCell>{record.flexibility}</TableCell>
+                      <TableCell>{record.hip_rom_left_internal}</TableCell>
+                      <TableCell>{record.hip_rom_left_external}</TableCell>
+                      <TableCell>{record.hip_rom_right_internal}</TableCell>
+                      <TableCell>{record.hip_rom_right_external}</TableCell>
                       <TableCell>
                         <Button
                           variant="contained"
@@ -186,7 +214,6 @@ function CustomerDetails() {
         )}
       </div>
 
-      {/* Modal za unos novih podataka */}
       {isFormModalOpen && (
         <Modal 
           isOpen={isFormModalOpen} 
@@ -216,6 +243,29 @@ function CustomerDetails() {
                   className="mt-1 block w-full p-2 border border-gray-300 rounded"
                 />
               </div>
+              {/* New Fields */}
+              <div>
+                <label htmlFor="flexibility" className="block text-sm font-medium text-gray-700">Fleksibilnost</label>
+                <input
+                  type="text"
+                  id="flexibility"
+                  value={flexibility}
+                  onChange={(e) => setFlexibility(e.target.value)}
+                  className="mt-1 block w-full p-2 border border-gray-300 rounded"
+                />
+              </div>
+              
+              <HipRomFormFields
+                hipRomLeftInternal={hipRomLeftInternal}
+                setHipRomLeftInternal={setHipRomLeftInternal}
+                hipRomLeftExternal={hipRomLeftExternal}
+                setHipRomLeftExternal={setHipRomLeftExternal}
+                hipRomRightInternal={hipRomRightInternal}
+                setHipRomRightInternal={setHipRomRightInternal}
+                hipRomRightExternal={hipRomRightExternal}
+                setHipRomRightExternal={setHipRomRightExternal}
+              />
+
               <div className="flex justify-end">
                 <button
                   type="button"

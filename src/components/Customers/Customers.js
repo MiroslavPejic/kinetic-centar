@@ -26,7 +26,7 @@ function Customers() {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('success');
   const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('create');
+  const [activeTab, setActiveTab] = useState('view');
   const [customers, setCustomers] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -109,7 +109,7 @@ function Customers() {
       setMessage(`Greška: ${error.message}`);
       setMessageType('error');
     } else {
-      setMessage('Kupac je uspješno dodan!');
+      setMessage('Klijent je uspješno dodan!');
       setMessageType('success');
       // Clear form fields
       setName('');
@@ -124,6 +124,7 @@ function Customers() {
       setInjuryNotes('');
       setDominantSide('');
       setPathology('');
+
       // Fetch updated customers
       const { data: newCustomers, error: fetchError } = await supabase.from('customers').select('*').eq('deleted', false);
       if (!fetchError) {
@@ -165,14 +166,14 @@ function Customers() {
   };
 
   return (
-    <div className="pt-16 px-4 max-w-full mx-auto">
+    <div className="pt-24 px-4 max-w-full mx-auto bg-gradient-to-b from-custom-blue to-white">
       <div className="customer-details bg-white p-6 rounded-lg shadow-lg">
         {/* Tab Bar */}
         <div className="flex border-b border-gray-300 mb-4">
           <button
             onClick={() => setActiveTab('create')}
-            className={`py-2 text-center font-medium text-sm border-b-2 w-1/3 ${
-              activeTab === 'create' ? 'border-custom-teal text-custom-teal' : 'border-transparent text-gray-600'
+            className={`py-2 text-center font-medium text-sm border-b-2 w-1/2 ${
+              activeTab === 'create' ? 'border-custom-blue text-custom-blue' : 'border-transparent text-gray-600'
             }`}
           >
             Dodaj klijenta
@@ -180,7 +181,7 @@ function Customers() {
           <button
             onClick={() => setActiveTab('view')}
             className={`py-2 text-center font-medium text-sm border-b-2 flex-1 ${
-              activeTab === 'view' ? 'border-custom-teal text-custom-teal' : 'border-transparent text-gray-600'
+              activeTab === 'view' ? 'border-custom-blue text-custom-blue' : 'border-transparent text-gray-600'
             }`}
           >
             Pregled klijenta
@@ -348,7 +349,7 @@ function Customers() {
 
         {activeTab === 'view' && (
           <div className="overflow-x-auto">
-            <h1 className="text-2xl font-bold mb-4 text-center">Pregled Kupaca</h1>
+            <h1 className="text-2xl font-bold mb-4 text-center">Pregled Klijenta</h1>
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr>

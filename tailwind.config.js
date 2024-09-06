@@ -12,6 +12,9 @@ module.exports = {
         'custom-text': '#313e48',  // Custom text color
         'custom-blue': '#002f46'
       },
+      backgroundImage: {
+        'login-pattern': "url('/src/assets/images/physiotherapy_clinic_background.png')"
+      }
     },
   },
   plugins: [],
