@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+
+import Modal from '../../Modal/Modal';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -9,12 +11,24 @@ function ViewCustomers({
   handleDownloadExcel
 }) {
     const navigate = useNavigate();
+    const [selectedCustomerId, setSelectedCustomerId] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     
     const handleViewCustomer = (id) => {
       navigate(`/customers/${id}`);
     };
 
-  return (
+    const openModal = (customerId) => {
+      setSelectedCustomerId(customerId);
+      console.log('customerId: ', customerId)
+      setIsModalOpen(true);
+    }
+
+    const closeModal = () => {
+      setIsModalOpen(false);
+    };
+
+    return (
     <>
           <div className="overflow-x-auto">
             <h1 className="text-2xl font-bold mb-4 text-center">Pregled Klijenta</h1>
@@ -60,7 +74,9 @@ function ViewCustomers({
                       </button>
                       &nbsp;
                       <button
-                        onClick={() => handleRemoveCustomer(customer.id)}
+                        onClick={() => {
+                          openModal(customer.id);
+                        }}
                         className="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                       >
                         Ukloni
@@ -78,6 +94,40 @@ function ViewCustomers({
             >
             Preuzmi Excel
           </button>
+
+          {/* Success/Error Modal */}
+          <Modal 
+            isOpen={isModalOpen} 
+            modalContent={
+              <>
+              
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-gray-600 opacity-50"></div>
+                  <div className="bg-white p-6 rounded-lg shadow-lg z-10 max-w-sm mx-auto">
+                    <h2 className='text-center'>
+                      Potvrdi
+                    </h2>
+                    <p className='text-center'>Ukloni Klijenta</p>
+                    <button
+                      className="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-custom-teal-dark"
+                      onClick={closeModal}
+                    >
+                      Ne
+                    </button>
+                    &nbsp;
+                    <button
+                      className="mt-4 bg-green-500 text-white py-2 px-4 rounded hover:bg-custom-teal-dark"
+                      onClick={() => {
+                        handleRemoveCustomer(selectedCustomerId);
+                        closeModal();
+                      }}
+                    >
+                      Ukloni
+                    </button>
+                  </div>
+                </div>
+              </>
+            } />
     </>
   );
 }
