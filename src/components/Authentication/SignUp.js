@@ -42,7 +42,7 @@ function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 bg-login-pattern bg-cover">
       <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
         <h1 className="text-2xl font-bold mb-6">Registracija</h1>
         {error && <p className="text-red-500 mb-4">{error}</p>}
