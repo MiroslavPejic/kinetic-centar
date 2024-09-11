@@ -7,9 +7,8 @@ import { Box, Button, TextField, Typography, Table, TableBody, TableCell, TableC
 import { Bar } from 'react-chartjs-2';  // Import Bar chart
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'; // Import chart dependencies
 
-// Form fields
-import BaseFields from './CustomerDetailFormFields/BaseFields';
-import HipRomFormFields from './CustomerDetailFormFields/HipRomFormFields';
+// Form
+import MultiStepForm from './MultiStepForm';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -34,6 +33,11 @@ function CustomerDetails() {
   const [hipRomLeftExternal, setHipRomLeftExternal] = useState('');
   const [hipRomRightInternal, setHipRomRightInternal] = useState('');
   const [hipRomRightExternal, setHipRomRightExternal] = useState('');
+
+  // EasyForce quadriceps fields
+  const [easyForceQuadriceps1, setEasyForceQuadriceps1] = useState('');
+  const [easyForceQuadriceps2, setEasyForceQuadriceps2] = useState('');
+  const [easyForceQuadriceps3, setEasyForceQuadriceps3] = useState('');
 
   // Latest Hip ROM
   const [latestHipRom, setLatestHipRom] = useState({
@@ -76,6 +80,7 @@ function CustomerDetails() {
         console.error('Greška prilikom dohvaćanja povijesti:', error);
       } else {
         setHistory(data);
+        console.log('data: ', data);
         if (data.length > 0) {
           const latestRecord = data[data.length - 1];
           setLatestHipRom({
@@ -127,6 +132,9 @@ function CustomerDetails() {
           hip_rom_left_external: hipRomLeftExternal,
           hip_rom_right_internal: hipRomRightInternal,
           hip_rom_right_external: hipRomRightExternal,
+          easyforcequadriceps1: easyForceQuadriceps1,
+          easyforcequadriceps2: easyForceQuadriceps2,
+          easyforcequadriceps3: easyForceQuadriceps3,
           date: new Date().toISOString(),
         },
       ]);
@@ -180,6 +188,13 @@ function CustomerDetails() {
   };
 
   const closeFormModal = () => {
+    setNewWeight('');
+    setNewDetail('');
+    setFlexibility('');
+    setHipRomLeftInternal('');
+    setHipRomLeftExternal('');
+    setHipRomRightInternal('');
+    setHipRomRightExternal('');
     setIsFormModalOpen(false);
   };
 
@@ -268,6 +283,9 @@ function CustomerDetails() {
                     <TableCell>Hip ROM Left-external</TableCell>
                     <TableCell>Hip ROM Right-internal</TableCell>
                     <TableCell>Hip ROM Right-external</TableCell>
+                    <TableCell>EasyForce Quadriceps 1</TableCell>
+                    <TableCell>EasyForce Quadriceps 2</TableCell>
+                    <TableCell>EasyForce Quadriceps 3</TableCell>
                     <TableCell>Akcija</TableCell>
                   </TableRow>
                 </TableHead>
@@ -282,6 +300,9 @@ function CustomerDetails() {
                       <TableCell>{record.hip_rom_left_external}</TableCell>
                       <TableCell>{record.hip_rom_right_internal}</TableCell>
                       <TableCell>{record.hip_rom_right_external}</TableCell>
+                      <TableCell>{record.easyforcequadriceps1}</TableCell>
+                      <TableCell>{record.easyforcequadriceps2}</TableCell>
+                      <TableCell>{record.easyforcequadriceps3}</TableCell>
                       <TableCell>
                         <Button
                           variant="contained"
@@ -324,42 +345,29 @@ function CustomerDetails() {
           onClose={closeFormModal}
           modalContent={
            <>
-           <h2 className="text-xl font-bold mb-4">Dodaj novi zapis</h2>
-            <form onSubmit={handleAddRecord} className="space-y-4">
-              <BaseFields
-                newWeight={newWeight}
-                setNewWeight={setNewWeight}
-                newDetail={newDetail}
-                setNewDetail={setNewDetail}
-                flexibility={flexibility}
-                setFlexibility={setFlexibility}/>
-
-              <HipRomFormFields
-                hipRomLeftInternal={hipRomLeftInternal}
-                setHipRomLeftInternal={setHipRomLeftInternal}
-                hipRomLeftExternal={hipRomLeftExternal}
-                setHipRomLeftExternal={setHipRomLeftExternal}
-                hipRomRightInternal={hipRomRightInternal}
-                setHipRomRightInternal={setHipRomRightInternal}
-                hipRomRightExternal={hipRomRightExternal}
-                setHipRomRightExternal={setHipRomRightExternal}/>
-
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={closeFormModal}
-                  className="bg-red-500 text-white py-2 px-4 rounded hover:bg-gray-700 mr-2"
-                >
-                  Odustani
-                </button>
-                <button
-                  type="submit"
-                  className="bg-custom-blue text-white py-2 px-4 rounded hover:bg-teal-700"
-                >
-                  Dodaj zapis
-                </button>
-              </div>
-            </form>
+             <MultiStepForm 
+               newWeight={newWeight}
+               setNewWeight={setNewWeight}
+               newDetail={newDetail}
+               setNewDetail={setNewDetail}
+               flexibility={flexibility}
+               setFlexibility={setFlexibility}
+               hipRomLeftExternal={hipRomLeftExternal}
+               setHipRomLeftExternal={setHipRomLeftExternal}
+               hipRomLeftInternal={hipRomLeftInternal}
+               setHipRomLeftInternal={setHipRomLeftInternal}
+               hipRomRightInternal={hipRomRightInternal}
+               setHipRomRightInternal={setHipRomRightInternal}
+               hipRomRightExternal={hipRomRightExternal}
+               setHipRomRightExternal={setHipRomRightExternal}
+               easyForceQuadriceps1={easyForceQuadriceps1}
+               setEasyForceQuadriceps1={setEasyForceQuadriceps1}
+               easyForceQuadriceps2={easyForceQuadriceps2}
+               setEasyForceQuadriceps2={setEasyForceQuadriceps2}
+               easyForceQuadriceps3={easyForceQuadriceps3}
+               setEasyForceQuadriceps3={setEasyForceQuadriceps3}
+               handleAddRecord={handleAddRecord}
+               closeFormModal={closeFormModal}/>
            </> 
           }>
         </Modal>
