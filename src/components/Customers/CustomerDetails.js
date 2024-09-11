@@ -319,7 +319,7 @@ function CustomerDetails() {
 
       {isFormModalOpen && (
         <Modal 
-          width={'750px'}
+          width={'500px'}
           isOpen={isFormModalOpen} 
           onClose={closeFormModal}
           modalContent={

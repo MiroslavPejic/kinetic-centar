@@ -5,9 +5,9 @@ function Modal({ isOpen, onClose, message, type, modalContent = null, width = '3
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 w-5">
+    <div className="fixed inset-0 flex items-center justify-center z-50 mx-auto">
       <div className="fixed inset-0 bg-gray-600 opacity-50"></div>
-      <div className="bg-white p-6 rounded-lg shadow-lg z-10 max-w-sm" style={{ width: width}}>
+      <div className="bg-white p-6 rounded-lg shadow-lg z-10" style={{ width: width}}>
         {
           modalContent !== null
           ? modalContent
