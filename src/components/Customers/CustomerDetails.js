@@ -35,9 +35,9 @@ function CustomerDetails() {
   const [hipRomRightExternal, setHipRomRightExternal] = useState('');
 
   // EasyForce quadriceps fields
-  const [easyForceQuadriceps1, setEasyForceQuadriceps1] = useState('');
-  const [easyForceQuadriceps2, setEasyForceQuadriceps2] = useState('');
-  const [easyForceQuadriceps3, setEasyForceQuadriceps3] = useState('');
+  const [easyForceQuadricepsLeft1, setEasyForceQuadricepsLeft1] = useState('');
+  const [easyForceQuadricepsLeft2, setEasyForceQuadricepsLeft2] = useState('');
+  const [easyForceQuadricepsLeft3, setEasyForceQuadricepsLeft3] = useState('');
 
   // Latest Hip ROM
   const [latestHipRom, setLatestHipRom] = useState({
@@ -132,9 +132,9 @@ function CustomerDetails() {
           hip_rom_left_external: hipRomLeftExternal,
           hip_rom_right_internal: hipRomRightInternal,
           hip_rom_right_external: hipRomRightExternal,
-          easyforcequadriceps1: easyForceQuadriceps1,
-          easyforcequadriceps2: easyForceQuadriceps2,
-          easyforcequadriceps3: easyForceQuadriceps3,
+          easy_force_quadriceps_left_1: easyForceQuadricepsLeft1,
+          easy_force_quadriceps_left_2: easyForceQuadricepsLeft2,
+          easy_force_quadriceps_left_3: easyForceQuadricepsLeft3,
           date: new Date().toISOString(),
         },
       ]);
@@ -152,6 +152,9 @@ function CustomerDetails() {
       setHipRomLeftExternal('');
       setHipRomRightInternal('');
       setHipRomRightExternal('');
+      setEasyForceQuadricepsLeft1('');
+      setEasyForceQuadricepsLeft2('');
+      setEasyForceQuadricepsLeft3('');
       setIsFormModalOpen(false);
 
       const { data: updatedHistory, error: historyError } = await supabase.from('customer_history').select('*').eq('customer_id', id);
@@ -283,9 +286,9 @@ function CustomerDetails() {
                     <TableCell>Hip ROM Left-external</TableCell>
                     <TableCell>Hip ROM Right-internal</TableCell>
                     <TableCell>Hip ROM Right-external</TableCell>
-                    <TableCell>EasyForce Quadriceps 1</TableCell>
-                    <TableCell>EasyForce Quadriceps 2</TableCell>
-                    <TableCell>EasyForce Quadriceps 3</TableCell>
+                    <TableCell>EasyForce Left Quadriceps 1</TableCell>
+                    <TableCell>EasyForce Left Quadriceps 2</TableCell>
+                    <TableCell>EasyForce Left Quadriceps 3</TableCell>
                     <TableCell>Akcija</TableCell>
                   </TableRow>
                 </TableHead>
@@ -300,9 +303,9 @@ function CustomerDetails() {
                       <TableCell>{record.hip_rom_left_external}</TableCell>
                       <TableCell>{record.hip_rom_right_internal}</TableCell>
                       <TableCell>{record.hip_rom_right_external}</TableCell>
-                      <TableCell>{record.easyforcequadriceps1}</TableCell>
-                      <TableCell>{record.easyforcequadriceps2}</TableCell>
-                      <TableCell>{record.easyforcequadriceps3}</TableCell>
+                      <TableCell>{record.easy_force_quadriceps_left_1}</TableCell>
+                      <TableCell>{record.easy_force_quadriceps_left_2}</TableCell>
+                      <TableCell>{record.easy_force_quadriceps_left_3}</TableCell>
                       <TableCell>
                         <Button
                           variant="contained"
@@ -360,12 +363,12 @@ function CustomerDetails() {
                setHipRomRightInternal={setHipRomRightInternal}
                hipRomRightExternal={hipRomRightExternal}
                setHipRomRightExternal={setHipRomRightExternal}
-               easyForceQuadriceps1={easyForceQuadriceps1}
-               setEasyForceQuadriceps1={setEasyForceQuadriceps1}
-               easyForceQuadriceps2={easyForceQuadriceps2}
-               setEasyForceQuadriceps2={setEasyForceQuadriceps2}
-               easyForceQuadriceps3={easyForceQuadriceps3}
-               setEasyForceQuadriceps3={setEasyForceQuadriceps3}
+               easyForceQuadriceps1={easyForceQuadricepsLeft1}
+               setEasyForceQuadriceps1={setEasyForceQuadricepsLeft1}
+               easyForceQuadriceps2={easyForceQuadricepsLeft2}
+               setEasyForceQuadriceps2={setEasyForceQuadricepsLeft2}
+               easyForceQuadriceps3={easyForceQuadricepsLeft3}
+               setEasyForceQuadriceps3={setEasyForceQuadricepsLeft3}
                handleAddRecord={handleAddRecord}
                closeFormModal={closeFormModal}/>
            </> 

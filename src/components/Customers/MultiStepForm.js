@@ -13,9 +13,9 @@ function MultiStepForm({
   hipRomLeftExternal, setHipRomLeftExternal,
   hipRomRightInternal, setHipRomRightInternal,
   hipRomRightExternal, setHipRomRightExternal,
-  easyForceQuadriceps1, setEasyForceQuadriceps1,
-  easyForceQuadriceps2, setEasyForceQuadriceps2,
-  easyForceQuadriceps3, setEasyForceQuadriceps3,
+  easyForceQuadricepsLeft1, setEasyForceQuadricepsLeft1,
+  easyForceQuadricepsLeft2, setEasyForceQuadricepsLeft2,
+  easyForceQuadricepsLeft3, setEasyForceQuadricepsLeft3,
   handleAddRecord, closeFormModal
 }) {
   const [currentStep, setCurrentStep] = useState(1);
@@ -65,12 +65,12 @@ function MultiStepForm({
         <div>
           <h2 className="text-xl font-bold mb-4">Step 2: Hip ROM Information</h2>
           <EasyForceFields 
-            easyForceQuadriceps1={easyForceQuadriceps1}
-            setEasyForceQuadriceps1={setEasyForceQuadriceps1}
-            easyForceQuadriceps2={easyForceQuadriceps2}
-            setEasyForceQuadriceps2={setEasyForceQuadriceps2}
-            easyForceQuadriceps3={easyForceQuadriceps3}
-            setEasyForceQuadriceps3={setEasyForceQuadriceps3}
+            easyForceQuadricepsLeft1={easyForceQuadricepsLeft1}
+            setEasyForceQuadricepsLeft1={setEasyForceQuadricepsLeft1}
+            easyForceQuadricepsLeft2={easyForceQuadricepsLeft2}
+            setEasyForceQuadricepsLeft2={setEasyForceQuadricepsLeft2}
+            easyForceQuadricepsLeft3={easyForceQuadricepsLeft3}
+            setEasyForceQuadricepsLeft3={setEasyForceQuadricepsLeft3}
           />
         </div>
       )}
