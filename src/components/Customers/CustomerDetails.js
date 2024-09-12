@@ -4,8 +4,13 @@ import supabase from '../../supabaseClient';
 import Modal from '../Modal/Modal';
 import { Box, Button, TextField, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, TablePagination } from '@mui/material';
 
+// Chart
 import { Bar } from 'react-chartjs-2';  // Import Bar chart
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'; // Import chart dependencies
+
+// PDF
+import jsPDF from 'jspdf'; // Import jsPDF
+import html2canvas from 'html2canvas'; // Import html2canvas
 
 // Form
 import MultiStepForm from './MultiStepForm';
@@ -252,8 +257,37 @@ function CustomerDetails() {
     },
   };
 
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(16);
+    doc.text('Customer Details - Hip ROM Data', 10, 10);
+    
+    // Add HIP ROM data as text
+    doc.setFontSize(12);
+    doc.text(`Latest HIP ROM Data:`, 10, 20);
+    doc.text(`Left Internal: ${latestHipRom.leftInternal}°`, 10, 30);
+    doc.text(`Left External: ${latestHipRom.leftExternal}°`, 10, 40);
+    doc.text(`Right Internal: ${latestHipRom.rightInternal}°`, 10, 50);
+    doc.text(`Right External: ${latestHipRom.rightExternal}°`, 10, 60);
+
+    // Convert the chart to an image
+    const chartElement = document.getElementById('hip-rom-chart'); // Make sure the chart has an id
+    html2canvas(chartElement).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+
+        // Add the chart as an image to the PDF
+        doc.addImage(imgData, 'PNG', 10, 70, 180, 90); // Adjust dimensions as needed
+        
+        // Save the PDF
+        doc.save('customer-details.pdf');
+    });
+};
+
+
   return (
-    <div className="pt-24 px-4 max-w-full mx-auto bg-gradient-to-b from-custom-blue to-white">
+    <div id="customer-details" className="pt-24 px-4 max-w-full mx-auto bg-gradient-to-b from-custom-blue to-white">
       <div className="bg-white p-6 rounded-lg shadow-lg">
         {customer && (
           <>
@@ -344,13 +378,16 @@ function CustomerDetails() {
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
 
-            {
-            
-            <div className="mt-8" style={{ maxWidth: '600px', margin: '0 auto' }}>
+            <div id="hip-rom-chart" className="mt-8" style={{ maxWidth: '600px', margin: '0 auto' }}>
               <Bar data={hipRomData} options={hipRomOptions} width={300} height={200} />
             </div>
-            
-            }
+
+            {/* Download PDF Button */}
+            <div className="text-center mt-4">
+              <Button variant="contained" color="primary" onClick={handleDownloadPDF}>
+                Preuzmi PDF
+              </Button>
+            </div>
           </>
         )}
       </div>
