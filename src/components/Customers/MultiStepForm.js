@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 // Import your field components
 import BaseFields from './CustomerDetailFormFields/BaseFields';
 import HipRomFormFields from './CustomerDetailFormFields/HipRomFormFields';
-import EasyForceFields from './CustomerDetailFormFields/EasyForceFields';
+import EasyForceQuadLeftFields from './CustomerDetailFormFields/EasyForceQuadLeftFields';
+import EasyForceQuadRightFields from './CustomerDetailFormFields/EasyForceQuadRightFields';
 
 function MultiStepForm({
   newWeight, setNewWeight,
@@ -16,10 +17,13 @@ function MultiStepForm({
   easyForceQuadricepsLeft1, setEasyForceQuadricepsLeft1,
   easyForceQuadricepsLeft2, setEasyForceQuadricepsLeft2,
   easyForceQuadricepsLeft3, setEasyForceQuadricepsLeft3,
+  easyForceQuadricepsRight1, setEasyForceQuadricepsRight1,
+  easyForceQuadricepsRight2, setEasyForceQuadricepsRight2,
+  easyForceQuadricepsRight3, setEasyForceQuadricepsRight3,
   handleAddRecord, closeFormModal
 }) {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
+  const totalSteps = 4;
 
   const handleNext = () => {
     setCurrentStep((prevStep) => prevStep + 1);
@@ -63,14 +67,28 @@ function MultiStepForm({
 
       {currentStep === 3 && (
         <div>
-          <h2 className="text-xl font-bold mb-4">Step 2: Hip ROM Information</h2>
-          <EasyForceFields 
+          <h2 className="text-xl font-bold mb-4">Step 3: EasyForce Quadriceps Left </h2>
+          <EasyForceQuadLeftFields 
             easyForceQuadricepsLeft1={easyForceQuadricepsLeft1}
             setEasyForceQuadricepsLeft1={setEasyForceQuadricepsLeft1}
             easyForceQuadricepsLeft2={easyForceQuadricepsLeft2}
             setEasyForceQuadricepsLeft2={setEasyForceQuadricepsLeft2}
             easyForceQuadricepsLeft3={easyForceQuadricepsLeft3}
             setEasyForceQuadricepsLeft3={setEasyForceQuadricepsLeft3}
+          />
+        </div>
+      )}
+
+      {currentStep === 4 && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Step 4: EasyForce Quadriceps Right </h2>
+          <EasyForceQuadRightFields 
+            easyForceQuadricepsRight1={easyForceQuadricepsRight1}
+            setEasyForceQuadricepsRight1={setEasyForceQuadricepsRight1}
+            easyForceQuadricepsRight2={easyForceQuadricepsRight2}
+            setEasyForceQuadricepsRight2={setEasyForceQuadricepsRight2}
+            easyForceQuadricepsRight3={easyForceQuadricepsRight3}
+            setEasyForceQuadricepsRight3={setEasyForceQuadricepsRight3}
           />
         </div>
       )}
@@ -91,7 +109,7 @@ function MultiStepForm({
             </button>
             )}
 
-            {currentStep < 3 && (
+            {currentStep < 4 && (
             <button
                 type="button"
                 onClick={handleNext}
@@ -101,7 +119,7 @@ function MultiStepForm({
             </button>
             )}
 
-            {currentStep === 3 && (
+            {currentStep === 4 && (
             <>
                 <button
                 type="button"

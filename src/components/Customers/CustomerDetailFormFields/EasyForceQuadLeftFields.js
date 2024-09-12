@@ -1,6 +1,6 @@
 import React from 'react';
 
-function EasyForceFields({
+function EasyForceQuadLeftFields({
   easyForceQuadricepsLeft1,
   setEasyForceQuadricepsLeft1,
   easyForceQuadricepsLeft2,
@@ -44,4 +44,4 @@ function EasyForceFields({
   );
 }
 
-export default EasyForceFields;
+export default EasyForceQuadLeftFields;

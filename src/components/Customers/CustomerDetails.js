@@ -38,13 +38,16 @@ function CustomerDetails() {
   const [easyForceQuadricepsLeft1, setEasyForceQuadricepsLeft1] = useState('');
   const [easyForceQuadricepsLeft2, setEasyForceQuadricepsLeft2] = useState('');
   const [easyForceQuadricepsLeft3, setEasyForceQuadricepsLeft3] = useState('');
+  const [easyForceQuadricepsRight1, setEasyForceQuadricepsRight1] = useState('');
+  const [easyForceQuadricepsRight2, setEasyForceQuadricepsRight2] = useState('');
+  const [easyForceQuadricepsRight3, setEasyForceQuadricepsRight3] = useState('');
 
   // Latest Hip ROM
   const [latestHipRom, setLatestHipRom] = useState({
-    leftInternal: '',
-    leftExternal: '',
-    rightInternal: '',
-    rightExternal: ''
+    leftInternal: null,
+    leftExternal: null,
+    rightInternal: null,
+    rightExternal: null
   });
 
   const [hipRomAverages, setHipRomAverages] = useState({
@@ -80,20 +83,20 @@ function CustomerDetails() {
         console.error('Greška prilikom dohvaćanja povijesti:', error);
       } else {
         setHistory(data);
-        console.log('data: ', data);
         if (data.length > 0) {
           const latestRecord = data[data.length - 1];
-          setLatestHipRom({
+          await setLatestHipRom({
             leftInternal: latestRecord.hip_rom_left_internal,
             leftExternal: latestRecord.hip_rom_left_external,
             rightInternal: latestRecord.hip_rom_right_internal,
             rightExternal: latestRecord.hip_rom_right_external
           });
+          console.log('latest data: ', latestHipRom);
         }
       }
     };
 
-    /*
+    
     const fetchAverages = async () => {
       const { data, error } = await supabase
         .rpc('get_hip_rom_averages', { excluded_customer_id: id }); // Call a stored procedure for averages
@@ -101,7 +104,6 @@ function CustomerDetails() {
       if (error) {
         console.error('Greška prilikom dohvaćanja prosjeka:', error);
       } else {
-        console.log('data here: ', data);
         setHipRomAverages({
           avgHipRomLeftInternal: data.avghipromleftinternal,
           avgHipRomLeftExternal: data.avgHipRomLeftExternal,
@@ -110,11 +112,11 @@ function CustomerDetails() {
         });
       }
     };
-    */
+    
 
     fetchCustomer();
     fetchHistory();
-    //fetchAverages();
+    fetchAverages();
   }, [id]);
 
   const handleAddRecord = async (event) => {
@@ -135,6 +137,9 @@ function CustomerDetails() {
           easy_force_quadriceps_left_1: easyForceQuadricepsLeft1,
           easy_force_quadriceps_left_2: easyForceQuadricepsLeft2,
           easy_force_quadriceps_left_3: easyForceQuadricepsLeft3,
+          easy_force_quadriceps_right_1: easyForceQuadricepsRight1,
+          easy_force_quadriceps_right_2: easyForceQuadricepsRight2,
+          easy_force_quadriceps_right_3: easyForceQuadricepsRight3,
           date: new Date().toISOString(),
         },
       ]);
@@ -155,6 +160,9 @@ function CustomerDetails() {
       setEasyForceQuadricepsLeft1('');
       setEasyForceQuadricepsLeft2('');
       setEasyForceQuadricepsLeft3('');
+      setEasyForceQuadricepsRight1('');
+      setEasyForceQuadricepsRight2('');
+      setEasyForceQuadricepsRight3('');
       setIsFormModalOpen(false);
 
       const { data: updatedHistory, error: historyError } = await supabase.from('customer_history').select('*').eq('customer_id', id);
@@ -216,14 +224,14 @@ function CustomerDetails() {
     datasets: [
       {
         label: 'Klijent',
-        data: [hipRomLeftInternal, hipRomLeftExternal, hipRomRightInternal, hipRomRightExternal],
+        data: [50, 40, 50, 40],
         backgroundColor: 'rgba(54, 162, 235, 0.6)',
         borderColor: 'rgba(54, 162, 235, 1)',
         borderWidth: 1,
       },
       {
         label: 'Prosjek',
-        data: [hipRomAverages.avgHipRomLeftInternal, hipRomAverages.avgHipRomLeftExternal, hipRomAverages.avgHipRomRightInternal, hipRomAverages.avgHipRomRightExternal],
+        data: [45, 39, 47, 39],
         backgroundColor: 'rgba(75, 192, 192, 0.6)',
         borderColor: 'rgba(75, 192, 192, 1)',
         borderWidth: 1,
@@ -289,6 +297,9 @@ function CustomerDetails() {
                     <TableCell>EasyForce Left Quadriceps 1</TableCell>
                     <TableCell>EasyForce Left Quadriceps 2</TableCell>
                     <TableCell>EasyForce Left Quadriceps 3</TableCell>
+                    <TableCell>EasyForce Right Quadriceps 1</TableCell>
+                    <TableCell>EasyForce Right Quadriceps 2</TableCell>
+                    <TableCell>EasyForce Right Quadriceps 3</TableCell>
                     <TableCell>Akcija</TableCell>
                   </TableRow>
                 </TableHead>
@@ -306,6 +317,9 @@ function CustomerDetails() {
                       <TableCell>{record.easy_force_quadriceps_left_1}</TableCell>
                       <TableCell>{record.easy_force_quadriceps_left_2}</TableCell>
                       <TableCell>{record.easy_force_quadriceps_left_3}</TableCell>
+                      <TableCell>{record.easy_force_quadriceps_right_1}</TableCell>
+                      <TableCell>{record.easy_force_quadriceps_right_2}</TableCell>
+                      <TableCell>{record.easy_force_quadriceps_right_3}</TableCell>
                       <TableCell>
                         <Button
                           variant="contained"
@@ -331,11 +345,11 @@ function CustomerDetails() {
             />
 
             {
-            /*
+            
             <div className="mt-8" style={{ maxWidth: '600px', margin: '0 auto' }}>
               <Bar data={hipRomData} options={hipRomOptions} width={300} height={200} />
             </div>
-            */
+            
             }
           </>
         )}
@@ -363,12 +377,18 @@ function CustomerDetails() {
                setHipRomRightInternal={setHipRomRightInternal}
                hipRomRightExternal={hipRomRightExternal}
                setHipRomRightExternal={setHipRomRightExternal}
-               easyForceQuadriceps1={easyForceQuadricepsLeft1}
-               setEasyForceQuadriceps1={setEasyForceQuadricepsLeft1}
-               easyForceQuadriceps2={easyForceQuadricepsLeft2}
-               setEasyForceQuadriceps2={setEasyForceQuadricepsLeft2}
-               easyForceQuadriceps3={easyForceQuadricepsLeft3}
-               setEasyForceQuadriceps3={setEasyForceQuadricepsLeft3}
+               easyForceQuadricepsLeft1={easyForceQuadricepsLeft1}
+               setEasyForceQuadricepsLeft1={setEasyForceQuadricepsLeft1}
+               easyForceQuadricepsLeft2={easyForceQuadricepsLeft2}
+               setEasyForceQuadricepsLeft2={setEasyForceQuadricepsLeft2}
+               easyForceQuadricepsLeft3={easyForceQuadricepsLeft3}
+               setEasyForceQuadricepsLeft3={setEasyForceQuadricepsLeft3}
+               easyForceQuadricepsRight1={easyForceQuadricepsRight1}
+               setEasyForceQuadricepsRight1={setEasyForceQuadricepsRight1}
+               easyForceQuadricepsRight2={easyForceQuadricepsRight2}
+               setEasyForceQuadricepsRight2={setEasyForceQuadricepsRight2}
+               easyForceQuadricepsRight3={easyForceQuadricepsRight3}
+               setEasyForceQuadricepsRight3={setEasyForceQuadricepsRight3}
                handleAddRecord={handleAddRecord}
                closeFormModal={closeFormModal}/>
            </> 
