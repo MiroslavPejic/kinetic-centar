@@ -47,12 +47,21 @@ function CustomerDetails() {
   const [easyForceQuadricepsRight2, setEasyForceQuadricepsRight2] = useState('');
   const [easyForceQuadricepsRight3, setEasyForceQuadricepsRight3] = useState('');
 
-  // Latest Hip ROM
-  const [latestHipRom, setLatestHipRom] = useState({
-    leftInternal: null,
-    leftExternal: null,
-    rightInternal: null,
-    rightExternal: null
+  // Latest data
+  const [latestRecordData, setLatestRecordData] = useState({
+    hipRomLeftInternal: null,
+    hipRomLeftExternal: null,
+    hipRomRightInternal: null,
+    hipRomRightExternal: null,
+    easyForceQuadricepsLeft1: 'N/A',
+    easyForceQuadricepsLeft2: 'N/A',
+    easyForceQuadricepsLeft3: 'N/A',
+    easyForceQuadricepsRight1: 'N/A',
+    easyForceQuadricepsRight2: 'N/A',
+    easyForceQuadricepsRight3: 'N/A',
+    weight: null,
+    detail: '',
+    flexibility: '',
   });
 
   const [hipRomAverages, setHipRomAverages] = useState({
@@ -90,13 +99,23 @@ function CustomerDetails() {
         setHistory(data);
         if (data.length > 0) {
           const latestRecord = data[data.length - 1];
-          await setLatestHipRom({
-            leftInternal: latestRecord.hip_rom_left_internal,
-            leftExternal: latestRecord.hip_rom_left_external,
-            rightInternal: latestRecord.hip_rom_right_internal,
-            rightExternal: latestRecord.hip_rom_right_external
+
+          // Consolidate all data into one variable
+          await setLatestRecordData({
+            hipRomLeftInternal: latestRecord.hip_rom_left_internal,
+            hipRomLeftExternal: latestRecord.hip_rom_left_external,
+            hipRomRightInternal: latestRecord.hip_rom_right_internal,
+            hipRomRightExternal: latestRecord.hip_rom_right_external,
+            easyForceQuadricepsLeft1: latestRecord.easy_force_quadriceps_left_1 || 'N/A',
+            easyForceQuadricepsLeft2: latestRecord.easy_force_quadriceps_left_2 || 'N/A',
+            easyForceQuadricepsLeft3: latestRecord.easy_force_quadriceps_left_3 || 'N/A',
+            easyForceQuadricepsRight1: latestRecord.easy_force_quadriceps_right_1 || 'N/A',
+            easyForceQuadricepsRight2: latestRecord.easy_force_quadriceps_right_2 || 'N/A',
+            easyForceQuadricepsRight3: latestRecord.easy_force_quadriceps_right_3 || 'N/A',
+            weight: latestRecord.weight || 'N/A',
+            detail: latestRecord.detail || 'N/A',
+            flexibility: latestRecord.flexibility || 'N/A',
           });
-          console.log('latest data: ', latestHipRom);
         }
       }
     };
@@ -260,31 +279,45 @@ function CustomerDetails() {
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
     
-    // Add title
+    // Add client name at the top
     doc.setFontSize(16);
-    doc.text('Customer Details - Hip ROM Data', 10, 10);
-    
+    doc.text(`Client: ${customer.name}`, 10, 20);
+    doc.text(`Weight: ${latestRecordData.weight || 'N/A'} kg`, 10, 40);
+    doc.text(`Flexibility: ${latestRecordData.flexibility || 'N/A'}`, 10, 50);
+
     // Add HIP ROM data as text
+    doc.setFontSize(14);
+    doc.text('Latest HIP ROM Data:', 10, 60);
     doc.setFontSize(12);
-    doc.text(`Latest HIP ROM Data:`, 10, 20);
-    doc.text(`Left Internal: ${latestHipRom.leftInternal}°`, 10, 30);
-    doc.text(`Left External: ${latestHipRom.leftExternal}°`, 10, 40);
-    doc.text(`Right Internal: ${latestHipRom.rightInternal}°`, 10, 50);
-    doc.text(`Right External: ${latestHipRom.rightExternal}°`, 10, 60);
+    doc.text(`Hip ROM Left Internal: ${latestRecordData.hipRomLeftInternal || 'N/A'}`, 10, 70);
+    doc.text(`Hip ROM Left External: ${latestRecordData.hipRomLeftExternal || 'N/A'}`, 10, 80);
+    doc.text(`Hip ROM Right Internal: ${latestRecordData.hipRomRightInternal || 'N/A'}`, 120, 70); // Right column
+    doc.text(`Hip ROM Right External: ${latestRecordData.hipRomRightExternal || 'N/A'}`, 120, 80); // Right column
+
+    // Add Quadriceps data as text
+    doc.setFontSize(14);
+    doc.text('Latest Quadriceps Data (EasyForce):', 10, 90);
+    doc.setFontSize(12);
+    doc.text(`Left Quadriceps 1: ${latestRecordData.easyForceQuadricepsLeft1 || 'N/A'}`, 10, 100); // Left column
+    doc.text(`Left Quadriceps 2: ${latestRecordData.easyForceQuadricepsLeft2 || 'N/A'}`, 10, 110); // Left column
+    doc.text(`Left Quadriceps 3: ${latestRecordData.easyForceQuadricepsLeft3 || 'N/A'}`, 10, 120); // Left column
+
+    doc.text(`Right Quadriceps 1: ${latestRecordData.easyForceQuadricepsRight1 || 'N/A'}`, 120, 100); // Right column
+    doc.text(`Right Quadriceps 2: ${latestRecordData.easyForceQuadricepsRight2 || 'N/A'}`, 120, 110); // Right column
+    doc.text(`Right Quadriceps 3: ${latestRecordData.easyForceQuadricepsRight3 || 'N/A'}`, 120, 120); // Right column
 
     // Convert the chart to an image
-    const chartElement = document.getElementById('hip-rom-chart'); // Make sure the chart has an id
+    const chartElement = document.getElementById('hip-rom-chart'); // Ensure the chart has this id
     html2canvas(chartElement).then((canvas) => {
         const imgData = canvas.toDataURL('image/png');
 
         // Add the chart as an image to the PDF
-        doc.addImage(imgData, 'PNG', 10, 70, 180, 90); // Adjust dimensions as needed
+        doc.addImage(imgData, 'PNG', 10, 140, 180, 90); // Adjust dimensions as needed
         
         // Save the PDF
-        doc.save('customer-details.pdf');
+        doc.save(`${customer.name}-details.pdf`);
     });
-};
-
+  };
 
   return (
     <div id="customer-details" className="pt-24 px-4 max-w-full mx-auto bg-gradient-to-b from-custom-blue to-white">
