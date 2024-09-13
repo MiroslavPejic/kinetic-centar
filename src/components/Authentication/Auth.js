@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import supabase from '../../supabaseClient';
 import { useNavigate, Link } from 'react-router-dom';
 
-import backgrounImg from '../../assets/images/physiotherapy_clinic_background.png'
+import backgrounImg from '../../assets/images/physiotherapy_clinic_background.png';
 
 function Auth() {
   const [email, setEmail] = useState('');
@@ -55,6 +55,13 @@ function Auth() {
             Nemate račun?{' '}
             <Link to="/signup" className="text-blue-500 hover:underline">
               Registrirajte se
+            </Link>
+          </p>
+          {/* Password reset link */}
+          <p className="mt-2">
+            Zaboravili ste lozinku?{' '}
+            <Link to="/forgot-password" className="text-blue-500 hover:underline">
+              Resetirajte lozinku
             </Link>
           </p>
         </div>

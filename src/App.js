@@ -8,6 +8,8 @@ import Profile from './components/Profile/Profile'
 import Customers from './components/Customers/Customers';
 import CustomerDetails from './components/Customers/CustomerDetails';
 import TopNavBar from './components/TopNavBar/TopNavBar';
+import ResetPassword from './components/Authentication/ResetPassword';
+import ForgotPassword from './components/Authentication/ForgotPassword';
 
 function App() {
   return (
@@ -15,6 +17,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Auth />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route
           path="*"
           element={<PageWithNav />}
@@ -36,27 +40,27 @@ function PageWithNav() {
         <Route 
           path="/dashboard" 
           element={
-            <ProtectedRoute>
+            
               <Dashboard />
-            </ProtectedRoute>
+            
           } 
         />
         <Route path="/profile" element={
-          <ProtectedRoute>
+          
             <Profile/>
-          </ProtectedRoute>
+          
           } 
         />
         <Route path="/customers" element={
-          <ProtectedRoute>
+          
             <Customers/>
-          </ProtectedRoute>
+          
           } 
         />
         <Route path="/customers/:id" element={
-          <ProtectedRoute>
+          
             <CustomerDetails />
-          </ProtectedRoute>
+          
           } 
         />
         {/* Add other routes here */}
